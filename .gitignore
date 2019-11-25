@@ -6,3 +6,6 @@ coverage
 .serverless
 *.env*
 .nyc_output
+*.iml
+*.iws
+*.ipr
