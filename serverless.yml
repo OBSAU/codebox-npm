@@ -12,7 +12,7 @@ service: codebox-npm
 
 provider:
   name: aws
-  runtime: nodejs10.x
+  runtime: nodejs12.x
   stage: ${opt:stage}
   region: ${env:CODEBOX_REGION}
   environment:
