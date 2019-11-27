@@ -59,15 +59,13 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
   const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    host: parsedUrl.host,
-    protocol: 'https',
-    pathPrefix: parsedUrl.path,
-  });
-
-  github.authenticate({
-    type: 'basic',
-    username: process.env.githubClientId,
-    password: process.env.githubSecret,
+    headers: {
+      accept: 'application/vnd.github.v3+json'
+    },
+    auth: {
+       username: process.env.githubClientId,
+       password: process.env.githubSecret
+    }
   });
 
   try {
@@ -75,7 +73,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
       user,
       updated_at,
       created_at,
-    } = await github.authorization.check({
+    } = await github.oauthAuthorizations.check({
       client_id: process.env.githubClientId,
       access_token: token,
     });

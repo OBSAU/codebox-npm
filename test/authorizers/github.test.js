@@ -34,7 +34,7 @@ describe('GitHub Authorizer', () => {
           gitHubInstance = createStubInstance(GitHub);
           checkAuthStub = stub().throws(new Error('Invalid token with GitHub app'));
 
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             check: checkAuthStub,
           };
           gitHubInstance.authenticate = stub();
@@ -151,7 +151,7 @@ describe('GitHub Authorizer', () => {
           });
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             check: checkAuthStub,
           };
           gitHubInstance.users = {
@@ -241,7 +241,7 @@ describe('GitHub Authorizer', () => {
           });
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             check: checkAuthStub,
           };
           gitHubInstance.users = {
@@ -328,7 +328,7 @@ describe('GitHub Authorizer', () => {
           });
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             check: checkAuthStub,
           };
 
@@ -338,16 +338,6 @@ describe('GitHub Authorizer', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should set credentials to authenticate with github api', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-client-id',
-          password: 'bar-secret',
-        }));
       });
 
       it('should check token with github', async () => {
@@ -423,7 +413,7 @@ describe('GitHub Authorizer', () => {
           });
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             check: checkAuthStub,
           };
 
@@ -433,16 +423,6 @@ describe('GitHub Authorizer', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should set credentials to authenticate with github api', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-client-id',
-          password: 'bar-secret',
-        }));
       });
 
       it('should check token with github', async () => {

@@ -19,20 +19,18 @@ export default async ({ body }, context, callback) => {
 
   const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    host: parsedUrl.host,
-    protocol: 'https',
-    pathPrefix: parsedUrl.path,
-  });
-
-  github.authenticate({
-    type: 'basic',
-    username,
-    password,
+    headers: {
+      accept: 'application/vnd.github.v3+json'
+    },
+    auth: {
+       username: username,
+       password: password
+    }
   });
 
   let auth = {};
   try {
-    auth = await github.authorization.getOrCreateAuthorizationForApp({
+    auth = await github.oauthAuthorizations.getOrCreateAuthorizationForApp({
       scopes,
       client_id: process.env.githubClientId,
       client_secret: process.env.githubSecret,
@@ -43,14 +41,14 @@ export default async ({ body }, context, callback) => {
     });
 
     if (!auth.token.length) {
-      await github.authorization.delete({
-        id: auth.id,
+      await github.oauthAuthorizations.deleteAuthorization({
+        authorization_id: auth.id,
         headers: {
           'X-GitHub-OTP': otp,
         },
       });
 
-      auth = await github.authorization.create({
+      auth = await github.oauthAuthorizations.createAuthorization({
         scopes,
         client_id: process.env.githubClientId,
         client_secret: process.env.githubSecret,

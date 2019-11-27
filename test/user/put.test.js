@@ -40,7 +40,7 @@ describe('PUT /registry/-/user/{id}', () => {
           authStub = stub();
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             getOrCreateAuthorizationForApp: getCreateAuthStub,
           };
 
@@ -50,16 +50,6 @@ describe('PUT /registry/-/user/{id}', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should set credentials to authenticate with github api', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-user',
-          password: 'bar-password',
-        }));
       });
 
       it('should get or create authorization for app correctly with otp', async () => {
@@ -99,7 +89,7 @@ describe('PUT /registry/-/user/{id}', () => {
           authStub = stub();
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             getOrCreateAuthorizationForApp: getCreateAuthStub,
           };
 
@@ -109,16 +99,6 @@ describe('PUT /registry/-/user/{id}', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should set credentials to authenticate with github api', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-user',
-          password: 'bar-password',
-        }));
       });
 
       it('should get or create authorization for app correctly', async () => {
@@ -175,10 +155,10 @@ describe('PUT /registry/-/user/{id}', () => {
           createAuthStub = stub().returns({ id: 'foo-user', token: 'new-foo-token' });
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             getOrCreateAuthorizationForApp: getCreateAuthStub,
-            delete: deleteAuthStub,
-            create: createAuthStub,
+            deleteAuthorization: deleteAuthStub,
+            createAuthorization: createAuthStub,
           };
 
           return gitHubInstance;
@@ -189,21 +169,11 @@ describe('PUT /registry/-/user/{id}', () => {
         });
       });
 
-      it('should set credentials to authenticate with github api', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-user',
-          password: 'bar-password',
-        }));
-      });
-
       it('should delete current token from github', async () => {
         await subject(event, stub(), callback);
 
         assert(deleteAuthStub.calledWithExactly({
-          id: 'foo-user',
+          authorization_id: 'foo-user',
           headers: {
             'X-GitHub-OTP': '',
           },
