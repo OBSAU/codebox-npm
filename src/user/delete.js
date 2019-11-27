@@ -1,4 +1,3 @@
-import url from 'url';
 import GitHub from '@octokit/rest';
 
 export default async ({ pathParameters }, context, callback) => {
@@ -6,21 +5,15 @@ export default async ({ pathParameters }, context, callback) => {
     token,
   } = pathParameters;
 
-  const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    host: parsedUrl.host,
-    protocol: 'https',
-    pathPrefix: parsedUrl.path,
-  });
-
-  github.authenticate({
-    type: 'basic',
-    username: process.env.githubClientId,
-    password: process.env.githubSecret,
+    auth: {
+       username: process.env.githubClientId,
+       password: process.env.githubSecret
+    }
   });
 
   try {
-    await github.authorization.reset({
+    await github.oauthAuthorizations.reset({
       client_id: process.env.githubClientId,
       access_token: token,
     });

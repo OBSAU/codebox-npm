@@ -39,7 +39,7 @@ describe('DELETE /registry/-/user/token/{token}', () => {
           resetAuthStub = stub();
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             reset: resetAuthStub,
           };
 
@@ -49,16 +49,6 @@ describe('DELETE /registry/-/user/token/{token}', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should authenticate using app credentials with github', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-client-id',
-          password: 'bar-secret',
-        }));
       });
 
       it('should reset token with github', async () => {
@@ -101,7 +91,7 @@ describe('DELETE /registry/-/user/token/{token}', () => {
           resetAuthStub = stub().throws(new Error('Invalid token'));
 
           gitHubInstance.authenticate = authStub;
-          gitHubInstance.authorization = {
+          gitHubInstance.oauthAuthorizations = {
             reset: resetAuthStub,
           };
 
@@ -111,16 +101,6 @@ describe('DELETE /registry/-/user/token/{token}', () => {
         subject.__Rewire__({
           GitHub: gitHubSpy,
         });
-      });
-
-      it('should authenticate using app credentials with github', async () => {
-        await subject(event, stub(), callback);
-
-        assert(authStub.calledWithExactly({
-          type: 'basic',
-          username: 'foo-client-id',
-          password: 'bar-secret',
-        }));
       });
 
       it('should return a 500 error', async () => {

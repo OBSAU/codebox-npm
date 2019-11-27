@@ -1,4 +1,3 @@
-import url from 'url';
 import GitHub from '@octokit/rest';
 
 const generatePolicy = ({
@@ -57,11 +56,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
   const token = tokenParts[1];
 
-  const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    headers: {
-      accept: 'application/vnd.github.v3+json'
-    },
     auth: {
        username: process.env.githubClientId,
        password: process.env.githubSecret

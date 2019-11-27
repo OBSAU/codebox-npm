@@ -1,4 +1,3 @@
-import url from 'url';
 import GitHub from '@octokit/rest';
 
 export default async ({ body }, context, callback) => {
@@ -17,11 +16,7 @@ export default async ({ body }, context, callback) => {
   const username = nameParts[0];
   const otp = nameParts.length > 1 ? nameParts[nameParts.length - 1] : '';
 
-  const parsedUrl = url.parse(process.env.githubUrl);
   const github = new GitHub({
-    headers: {
-      accept: 'application/vnd.github.v3+json'
-    },
     auth: {
        username: username,
        password: password
@@ -40,7 +35,7 @@ export default async ({ body }, context, callback) => {
       },
     });
 
-    if (!auth.token.length) {
+    if (!auth.data.hashed_token.length) {
       await github.oauthAuthorizations.deleteAuthorization({
         authorization_id: auth.id,
         headers: {
@@ -63,7 +58,7 @@ export default async ({ body }, context, callback) => {
       statusCode: 201,
       body: JSON.stringify({
         ok: true,
-        token: auth.token,
+        token: auth.data.hashed_token,
       }),
     });
   } catch (error) {

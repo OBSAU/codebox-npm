@@ -36,7 +36,7 @@ describe('PUT /registry/-/user/{id}', () => {
 
         gitHubSpy = spy(() => {
           gitHubInstance = createStubInstance(GitHub);
-          getCreateAuthStub = stub().returns({ token: 'foo-token' });
+          getCreateAuthStub = stub().returns({ data: { hashed_token: 'foo-token' }});
           authStub = stub();
 
           gitHubInstance.authenticate = authStub;
@@ -85,7 +85,7 @@ describe('PUT /registry/-/user/{id}', () => {
 
         gitHubSpy = spy(() => {
           gitHubInstance = createStubInstance(GitHub);
-          getCreateAuthStub = stub().returns({ token: 'foo-token' });
+          getCreateAuthStub = stub().returns({ data: { hashed_token: 'foo-token' }});
           authStub = stub();
 
           gitHubInstance.authenticate = authStub;
@@ -148,11 +148,11 @@ describe('PUT /registry/-/user/{id}', () => {
 
           // GitHub does not return a token
           // if you already have one assigned
-          getCreateAuthStub = stub().returns({ id: 'foo-user', token: '' });
+          getCreateAuthStub = stub().returns({ id: 'foo-user', data: { hashed_token: '' } });
 
           authStub = stub();
           deleteAuthStub = stub();
-          createAuthStub = stub().returns({ id: 'foo-user', token: 'new-foo-token' });
+          createAuthStub = stub().returns({ id: 'foo-user', data: { hashed_token: 'new-foo-token' } });
 
           gitHubInstance.authenticate = authStub;
           gitHubInstance.oauthAuthorizations = {
