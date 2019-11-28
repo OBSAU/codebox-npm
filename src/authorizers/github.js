@@ -57,10 +57,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
   const token = tokenParts[1];
 
   const github = new GitHub({
-    auth: {
-       username: process.env.githubClientId,
-       password: process.env.githubSecret
-    }
+    auth: "token " + authorizationToken
   });
 
   try {
@@ -68,41 +65,12 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
       user,
       updated_at,
       created_at,
-    } = await github.oauthAuthorizations.check({
-      client_id: process.env.githubClientId,
-      access_token: token,
+    } = await github.oauthAuthorizations.getAuthorization({
+      authorization_id: token,
     });
 
     let isAdmin = false;
     let effect = 'Allow';
-    let restrictedOrgs = [];
-
-    if (process.env.restrictedOrgs) {
-      restrictedOrgs = process.env.restrictedOrgs.split(',');
-    }
-
-    if (restrictedOrgs.length) {
-      try {
-        github.authenticate({
-          type: 'token',
-          token,
-        });
-
-        const orgs = await github.users.getOrgMemberships({
-          state: 'active',
-        });
-
-        const usersOrgs = orgs.filter(org => restrictedOrgs.indexOf(org.organization.login) > -1);
-        effect = usersOrgs.length ? 'Allow' : 'Deny';
-      } catch (githubError) {
-        return callback(null, generatePolicy({
-          token: tokenParts[1],
-          effect: 'Deny',
-          methodArn,
-          isAdmin: false,
-        }));
-      }
-    }
 
     if (process.env.admins) {
       isAdmin = process.env.admins.split(',').indexOf(user.login) > -1;
