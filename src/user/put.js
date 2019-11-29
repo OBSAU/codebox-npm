@@ -35,9 +35,9 @@ export default async ({ body }, context, callback) => {
       },
     });
 
-    if (!auth.data.hashed_token.length) {
+    if (!auth.data.token.length) {
       await github.oauthAuthorizations.deleteAuthorization({
-        authorization_id: auth.id,
+        authorization_id: auth.data.id,
         headers: {
           'X-GitHub-OTP': otp,
         },
@@ -58,7 +58,7 @@ export default async ({ body }, context, callback) => {
       statusCode: 201,
       body: JSON.stringify({
         ok: true,
-        token: auth.data.hashed_token,
+        token: auth.data.token,
       }),
     });
   } catch (error) {

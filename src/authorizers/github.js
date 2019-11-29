@@ -57,17 +57,13 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
   const token = tokenParts[1];
 
   const github = new GitHub({
-    auth: "token " + authorizationToken
+    auth: "Bearer " + authorizationToken
   });
 
   try {
-    const {
-      user,
-      updated_at,
-      created_at,
-    } = await github.oauthAuthorizations.getAuthorization({
-      authorization_id: token,
-    });
+    const user = await github.users.getAuthenticated();
+    const updated_at = user.data.updated_at;
+    const created_at = user.data.created_at;
 
     let isAdmin = false;
     let effect = 'Allow';
@@ -92,6 +88,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
     return callback(null, policy);
   } catch (error) {
+    console.log
     return callback(null, generatePolicy({
       token: tokenParts[1],
       effect: 'Deny',
