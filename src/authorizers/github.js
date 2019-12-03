@@ -46,6 +46,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
   const tokenParts = authorizationToken.split('Bearer ');
 
   if (tokenParts.length <= 1) {
+    console.log("Not enough token parts:", JSON.stringify(tokenParts, 0, 2));
     return callback(null, generatePolicy({
       token: authorizationToken,
       effect: 'Deny',
@@ -57,7 +58,10 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
   const token = tokenParts[1];
 
   const github = new GitHub({
-    auth: "Bearer " + authorizationToken
+    auth: {
+      username: 'obs-integrations',
+      password: token
+    }
   });
 
   try {
@@ -66,14 +70,13 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
     const created_at = user.data.created_at;
 
     let isAdmin = false;
-    let effect = 'Allow';
 
     if (process.env.admins) {
       isAdmin = process.env.admins.split(',').indexOf(user.login) > -1;
     }
 
     const policy = generatePolicy({
-      effect,
+      effect: 'Allow',
       methodArn,
       token,
       isAdmin,
@@ -88,7 +91,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
 
     return callback(null, policy);
   } catch (error) {
-    console.log
+    console.log("Authorizer error", JSON.stringify(error, 0, 2));
     return callback(null, generatePolicy({
       token: tokenParts[1],
       effect: 'Deny',
