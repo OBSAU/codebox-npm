@@ -12,34 +12,26 @@ module.exports = {
   performance: {
       hints: false,  // Turn off size warnings for entry points
   },
-  entry: {
-    authorizerGithub: ["@babel/polyfill", './src/authorizers/github.js'],
-    put: ["@babel/polyfill", './src/put/index.js'],
-    get: ["@babel/polyfill", './src/get/index.js'],
-    distTagsGet: ["@babel/polyfill", './src/dist-tags/get.js'],
-    distTagsPut: ["@babel/polyfill", './src/dist-tags/put.js'],
-    distTagsDelete: ["@babel/polyfill", './src/dist-tags/delete.js'],
-    userPut: ["@babel/polyfill", './src/user/put.js'],
-    userDelete: ["@babel/polyfill", './src/user/delete.js'],
-    whoamiGet: ["@babel/polyfill", './src/whoami/get.js'],
-    tarGet: ["@babel/polyfill", './src/tar/get.js'],
-  },
+  entry: slsw.lib.entries,
+  mode: slsw.lib.webpack.isLocal ? 'development' : 'production',
   output: {
-    libraryTarget: 'corejs',
+    libraryTarget: 'commonjs',
     path: path.join(__dirname, '.webpack'),
     filename: '[name].js',
   },
   module: {
-    loaders: [{
-      test: /\.js$/,
-      loader: 'babel-loader',
-      include: /src/,
-      exclude: /node_modules/,
-      presets: ['@babel/env']
-    },
-    {
-      test: /\.json$/,
-      loader: 'json-loader',
-    }],
+    rules: [
+      {
+        test: /\.m?js$/,
+        exclude: /(node_modules|bower_components)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: [ '@babel/preset-env'],
+            plugins: [ '@babel/plugin-transform-runtime' ]
+          }
+        }
+      }
+    ]
   },
 };

@@ -13,6 +13,7 @@
     "@babel/register": "^7.7.0",
     "@babel/plugin-syntax-dynamic-import": "^7.7.0",
     "@babel/plugin-syntax-import-meta": "^7.7.0",
+    "@babel/plugin-transform-runtime": "^7.7.0",
     "aws-sdk": "^2.536.0",
     "babel-loader": "^8.0.0",
     "babel-plugin-rewire": "^1.2.0",
@@ -52,6 +53,7 @@
   "homepage": "https://github.com/craftship/codebox-npm#readme",
   "dependencies": {
     "@babel/polyfill": "^7.7.0",
+    "@babel/runtime": "^7.7.0",
     "@babel/runtime-corejs3": "^7.7.0",
     "@octokit/rest": "^16.35.0",
     "node-fetch": "^1.6.3"
