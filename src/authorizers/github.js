@@ -72,7 +72,7 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
     let isAdmin = false;
 
     if (process.env.admins) {
-      isAdmin = process.env.admins.split(',').indexOf(user.login) > -1;
+      isAdmin = process.env.admins.split(',').indexOf(user.data.login) > -1;
     }
 
     const policy = generatePolicy({
@@ -83,8 +83,8 @@ export default async ({ methodArn, authorizationToken }, context, callback) => {
     });
 
     policy.context = {
-      username: user.login,
-      avatar: user.avatar_url,
+      username: user.data.login,
+      avatar: user.data.avatar_url,
       updatedAt: updated_at,
       createdAt: created_at,
     };
