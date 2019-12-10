@@ -33,9 +33,11 @@ provider:
     githubSecret:  ${env:CODEBOX_GITHUB_SECRET}
     bucket: ${env:CODEBOX_BUCKET}-${self:provider.stage}
     region: ${self:provider.region}
-
     clientId: ${env:CODEBOX_INSIGHTS_CLIENT_ID}
     secret: ${env:CODEBOX_INSIGHTS_SECRET}
+  apiGateway:
+    binaryMediaTypes:
+      - '*/*'
   iamRoleStatements:
     - Effect: "Allow"
       Action:
@@ -53,7 +55,7 @@ functions:
     handler: src/authorizers/github.default
 
   put:
-    handler: src/put/index.default
+    handler: src/put/publish.handler
     events:
       - http:
           path: 'registry/{name}'
@@ -116,18 +118,9 @@ functions:
     handler: src/tar/get.handler
     events:
       - http:
-          integration: lambda
           authorizer: authorizerGithub
           path: 'registry/{name}/-/{tar}'
           method: get
-          contentHandling: CONVERT_TO_BINARY
-          request:
-            template:
-              application/json: >
-                {
-                  "name": "$input.params('name')",
-                  "tar": "$input.params('tar')"
-                }
 
 resources:
   Resources:
