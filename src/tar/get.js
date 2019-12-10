@@ -12,7 +12,7 @@ function loadIndex(packageName, tarName, callback) {
     let params = {
         Bucket: process.env.bucket,
         Key: `${packageName}/${fileName}`
-    }
+    };
 
     const s3 = new AWS.S3();
 
@@ -28,17 +28,25 @@ function loadIndex(packageName, tarName, callback) {
         } else {
             console.log("Found content for ", params.Key);
 
-            callback(null, data.Body.toString('base64'));
+            const response = {
+                statusCode: 200,
+                headers: {
+                    "Content-Type" : "application/octet-stream"
+                },
+                isBase64Encoded: true,
+                body: data.Body.toString('base64'),
+            };
+
+            callback(null, response);
         }
     });
 }
 
-exports.handler = (event, context, handlerCallback) => {
-
+exports.handler = function (event, context, handlerCallback)  {
     console.log("Event received is " + JSON.stringify(event));
 
-    const packageName = `${decodeURIComponent(event.name)}`;
-    const tarName = `${decodeURIComponent(event.tar)}`;
+    const packageName = `${decodeURIComponent(event.pathParameters.name)}`;
+    const tarName = `${decodeURIComponent(event.pathParameters.tar)}`;
 
     loadIndex(packageName, tarName, handlerCallback);
-}
+};
