@@ -1,5 +1,4 @@
 import npm from './adapters/npm';
-import S3 from './adapters/s3';
 import Logger from './adapters/logger';
 
 const user = authorizer => ({
@@ -23,12 +22,6 @@ const command = (headers) => {
     args: [],
   };
 };
-
-const storage = (region, bucket) =>
-  new S3({
-    region,
-    bucket,
-  });
 
 const log = (cmd, namespace, region, topic) => {
   if (process.env.clientId && process.env.secret) {
@@ -66,7 +59,6 @@ export default (namespace, { headers, requestContext }) => {
     registry,
     apiEndpoint,
     user: user(requestContext.authorizer),
-    storage: storage(region, bucket),
     log: log(cmd, namespace, region, logTopic),
     npm,
   };

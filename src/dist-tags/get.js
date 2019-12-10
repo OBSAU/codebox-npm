@@ -1,55 +1,46 @@
-import npm from '../adapters/npm';
-import S3 from '../adapters/s3';
-import Logger from '../adapters/logger';
+/**
+ * Lists tags on a package
+ */
+"use strict";
 
-export default async ({
-  requestContext,
-  pathParameters,
-}, context, callback) => {
-  const { registry, bucket, region, logTopic } = process.env;
-  const user = {
-    name: requestContext.authorizer.username,
-    avatar: requestContext.authorizer.avatar,
-  };
-  const storage = new S3({ region, bucket });
-  const log = new Logger('dist-tags:get', { region, topic: logTopic });
+const AWS = require('aws-sdk');
 
-  const name = `${decodeURIComponent(pathParameters.name)}`;
+function loadIndex(packageName, tagName, callback) {
+    let params = {
+        Bucket: process.env.bucket,
+        Key: `${packageName}/index.json`
+    };
 
-  try {
-    const pkgBuffer = await storage.get(`${name}/index.json`);
-    const json = JSON.parse(pkgBuffer.toString());
-    return callback(null, {
-      statusCode: 200,
-      body: JSON.stringify(json['dist-tags']),
+    const s3 = new AWS.S3();
+
+    s3.getObject(params, (err, data) => {
+        if(err) {
+            console.log("Error locating package index", err);
+
+            callback(null, {
+                statusCode: 404,
+                body: JSON.stringify({
+                    error: err.message,
+                }),
+            });
+        } else {
+            console.log("Found index for ", params.Key);
+
+            let json = JSON.parse(data.Body.toString());
+
+            callback(null, {
+                statusCode: 200,
+                body: JSON.stringify(json['dist-tags']),
+            });
+        }
     });
-  } catch (storageError) {
-    if (storageError.code === 'NoSuchKey') {
-      try {
-        const data = await npm.package(registry, name);
-        return callback(null, {
-          statusCode: 200,
-          body: JSON.stringify(data['dist-tags']),
-        });
-      } catch ({ message }) {
-        return callback(null, {
-          statusCode: 404,
-          body: JSON.stringify({
-            ok: false,
-            error: message,
-          }),
-        });
-      }
-    }
+}
 
-    await log.error(user, storageError);
+exports.handler = (event, context, handlerCallback) => {
 
-    return callback(null, {
-      statusCode: 500,
-      body: JSON.stringify({
-        ok: false,
-        error: storageError.message,
-      }),
-    });
-  }
+    //console.log("Event received is " + JSON.stringify(event));
+    const packageName = `${decodeURIComponent(event.pathParameters.name)}`;
+    const tagName = event.pathParameters.tag;
+
+    loadIndex(packageName, tagName, handlerCallback);
 };

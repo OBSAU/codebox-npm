@@ -26,15 +26,12 @@ provider:
   memorySize: 512
   environment:
     admins: ${env:CODEBOX_ADMINS}
-    restrictedOrgs: ${env:CODEBOX_RESTRICTED_ORGS}
     registry: ${env:CODEBOX_REGISTRY}
     githubUrl: ${env:CODEBOX_GITHUB_URL}
     githubClientId:  ${env:CODEBOX_GITHUB_CLIENT_ID}
     githubSecret:  ${env:CODEBOX_GITHUB_SECRET}
     bucket: ${env:CODEBOX_BUCKET}-${self:provider.stage}
     region: ${self:provider.region}
-    clientId: ${env:CODEBOX_INSIGHTS_CLIENT_ID}
-    secret: ${env:CODEBOX_INSIGHTS_SECRET}
   apiGateway:
     binaryMediaTypes:
       - '*/*'
@@ -62,7 +59,7 @@ functions:
           method: put
           authorizer: authorizerGithub
   get:
-    handler: src/get/index.default
+    handler: src/get/index.handler
     events:
       - http:
           path: 'registry/{name}'
@@ -70,21 +67,21 @@ functions:
           authorizer: authorizerGithub
 
   distTagsGet:
-    handler: src/dist-tags/get.default
+    handler: src/dist-tags/get.handler
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags'
           method: get
           authorizer: authorizerGithub
   distTagsPut:
-    handler: src/dist-tags/put.default
+    handler: src/dist-tags/put.handler
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
           method: put
           authorizer: authorizerGithub
   distTagsDelete:
-    handler: src/dist-tags/delete.default
+    handler: src/dist-tags/delete.handler
     events:
       - http:
           path: 'registry/-/package/{name}/dist-tags/{tag}'
@@ -107,7 +104,7 @@ functions:
           authorizer: authorizerGithub
 
   whoamiGet:
-    handler: src/whoami/get.default
+    handler: src/whoami/get.handler
     events:
       - http:
           path: 'registry/-/whoami'
