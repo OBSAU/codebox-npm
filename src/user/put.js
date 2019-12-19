@@ -1,4 +1,32 @@
-import GitHub from '@octokit/rest';
+/*
+ * Publish a new version of the package
+ */
+'use strict';
+
+const AWS = require('aws-sdk');
+
+exports.handler = (event, context, handlerCallback) => {
+
+    //console.log("Event received is " + JSON.stringify(event));
+
+    let body = event.body;
+    if(event.isBase64Encoded) {
+        let buff = Buffer.from(body, 'base64');
+        body = buff.toString('ascii');
+    }
+
+    const request = JSON.parse(body);
+
+    let username = request.name;
+    const password = request.password;
+
+    const nameParts = name.split('.');
+    const username = nameParts[0];
+
+    ssm = new AWS.SSM();
+
+    // fetch password and username
+}
 
 export default async ({ body }, context, callback) => {
   const {
